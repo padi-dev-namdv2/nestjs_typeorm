@@ -13,7 +13,7 @@ export class $npmConfigName1673863729477 implements MigrationInterface {
                     generationStrategy: 'increment',
                 },
                 {
-                    name: "username",
+                    name: "name",
                     type: "varchar",
                 },
                 {
@@ -26,8 +26,13 @@ export class $npmConfigName1673863729477 implements MigrationInterface {
                     type: "varchar",
                 },
                 {
+                    name: "guard",
+                    type: "varchar",
+                },
+                {
                     name: 'role_id',
                     type: 'int',
+                    default: '0'
                 },
                 {
                     name: 'created_at',
@@ -39,11 +44,6 @@ export class $npmConfigName1673863729477 implements MigrationInterface {
                     type: 'datetime',
                     default: 'now()',
                 },
-                {
-                    name: 'deleted_at',
-                    type: 'datetime',
-                    default: null,
-                }
             ]
         }), true);
     }

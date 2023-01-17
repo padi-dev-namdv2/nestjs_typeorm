@@ -1,9 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn} from "typeorm";
 import { Length, IsNotEmpty, MinLength, MaxLength, Validate } from "class-validator";
 import * as bcrypt from "bcryptjs";
 
-@Entity()
-export class Users {
+@Entity('users')
+export class User {
     @PrimaryGeneratedColumn()
     id: number;
 
@@ -14,7 +14,7 @@ export class Users {
     @MaxLength(50, {
         message: 'Username is too long',
     })
-    username: string;
+    name: string;
 
     @Column({ unique: true })
     @MinLength(20, {
@@ -34,24 +34,16 @@ export class Users {
     role_id: number;
 
     @Column()
-    @IsNotEmpty()
-    status: number;
+    @Length(4, 100)
+    guard: string;
 
     @Column()
     @CreateDateColumn()
-    createdAt: Date;
+    created_at: Date;
 
     @Column()
     @UpdateDateColumn()
-    updatedAt: Date;
-
-    @Column()
-    @UpdateDateColumn()
-    deletedAt: Date;
-
-    @Column()
-    @IsNotEmpty()
-    rolesId: number;
+    updated_at: Date;
 
     hashPassword() {
         this.password = bcrypt.hashSync(this.password, 8);

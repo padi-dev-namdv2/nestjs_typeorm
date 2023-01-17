@@ -1,7 +1,9 @@
 import "reflect-metadata"
-import { DataSource } from "typeorm"
+import { DataSource, DataSourceOptions } from "typeorm"
+import { SeederOptions, SeederFactoryManager } from "typeorm-extension"
+import { MainSeeder } from "./src/database/seeder/main.seeder";
 
-export const AppDataSource = new DataSource({
+const options: DataSourceOptions & SeederOptions = {
     type: "mysql",
     host: "localhost",
     port: 3306,
@@ -11,11 +13,15 @@ export const AppDataSource = new DataSource({
     synchronize: false,
     logging: false,
     entities: [
-        "src/entity/**/*.ts"
+        "src/module/**/entities/*.ts"
     ],
     migrations: [
         "src/database/migration/**/*.ts"
     ],
     subscribers: [],
-    cache: true
-})
+    cache: true,
+    seeds: [MainSeeder],
+    factories: ['src/database/factory/**/*{.ts,.js}'],
+};
+
+export const AppDataSource = new DataSource(options)
