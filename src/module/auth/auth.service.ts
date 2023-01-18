@@ -8,11 +8,14 @@ import { UsersService } from '../users/users.service';
 import * as jwt from "jsonwebtoken";
 const bcrypt = require("bcrypt");
 import config from "../../../src/config/index.config";
+import { Role } from './entities/role.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService,) {
+    private readonly usersService: UsersService,
+    @InjectRepository(Role)
+    private readonly rolesRepository: Repository<Role>) {
   }
 
   async login(loginAuthDto: LoginAuthDto) {
@@ -21,7 +24,7 @@ export class AuthService {
       return {result: false, message: 'Email is not empty!'};
     }
 
-    var checkPassword: boolean = await bcrypt.compare(loginAuthDto.password, checkEmptyUser.password);
+    const checkPassword: boolean = await bcrypt.compare(loginAuthDto.password, checkEmptyUser.password);
     if (!checkPassword) {
       return {result: false, message: 'Password wrong!'};
     }
@@ -42,5 +45,26 @@ export class AuthService {
 
   register(registerAuthDto: RegisterAuthDto) {
     return `This action returns all auth`;
+  }
+
+  async listRoles(params: any) {
+    const limitRow = 5;
+    const offset: number = params.page ? (params.page - 1) * limitRow : 0;
+    const roles = await this.rolesRepository.findAndCount({
+      select: ["id", "name"],
+      take: limitRow,
+      skip: offset
+    })
+
+    const data = {
+      listRoles: roles,
+      currentPage: params.page ?? 1
+    };
+
+    return {result: data, message: 'List roles!' };
+  }
+
+  async addRole(params: any) {
+    
   }
 }

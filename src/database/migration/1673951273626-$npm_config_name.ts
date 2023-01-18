@@ -18,6 +18,16 @@ export class $npmConfigName1673951273626 implements MigrationInterface {
                     type: "varchar",
                     isUnique: true
                 },
+                {
+                    name: 'created_at',
+                    type: 'datetime',
+                    default: 'now()'
+                },
+                {
+                    name: 'updated_at',
+                    type: 'datetime',
+                    default: 'now()'
+                }
             ]
         }), true);
     }

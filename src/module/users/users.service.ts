@@ -20,7 +20,8 @@ export class UsersService {
     const limitRow = 5;
     const offset = params.page ? (params.page - 1) * limitRow : 0;
     const listUser = await this.usersRepository.findAndCount({
-      select: ["id", "name", 'email', "role_id", 'created_at'],
+      select: ["id", "name", 'email', 'created_at'],
+      relations: ["role"],
       take: limitRow,
       skip: offset
     });
@@ -33,21 +34,27 @@ export class UsersService {
     return {result: data, message: 'Lấy dữ liệu thành công'};
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: number) {
+    return await this.usersRepository.findOne({
+      where: {
+        id: id
+      }
+    });
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {
     return `This action updates a #${id} user`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: number) {
+    const deleteUser = await this.usersRepository.delete(id);
+
+    return deleteUser.affected;
   }
 
   async findByEmail(email: string) {
     return await this.usersRepository.findOne({
-      select: ["id", "email", "name", "role_id", "password"],
+      select: ["id", "email", "name", "roleId", "password"],
       where: {
         email: email
       }

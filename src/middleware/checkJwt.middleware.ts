@@ -22,7 +22,7 @@ export const checkJwt = (req: Request, res: Response, next: NextFunction) => {
     const newToken = jwt.sign({ id, name, email }, config.jwtSecret, {
         expiresIn: "1h"
     });
-    res.setHeader("token", newToken);
+    res.setHeader("x-api-key", newToken);
 
     next();  //Call the next middleware or controller
 };

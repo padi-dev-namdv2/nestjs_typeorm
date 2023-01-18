@@ -4,8 +4,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Response } from 'express';
 import { BaseController } from 'src/app/controller/base.controller';
+import { User } from './entities/user.entity';
 
-@Controller('users')
+@Controller('api/users')
 export class UsersController extends BaseController {
   constructor(private readonly usersService: UsersService) {
     super();
@@ -24,17 +25,21 @@ export class UsersController extends BaseController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+  async findOne(@Param('id') id: number, @Res() res: Response) {
+    const user = this.usersService.findOne(id);
+
+    return user ? this.withData(res, user) : this.notFound(res);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  async remove(@Param('id') id: number, @Res() res: Response) {
+    const deleteUser = await this.usersService.remove(id);
+
+    return deleteUser ? this.withData(res, '', 'Delete Success!') : this.notFound(res, 'Not Found!');
   }
 }

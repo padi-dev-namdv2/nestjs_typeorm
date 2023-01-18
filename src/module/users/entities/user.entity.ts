@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, ManyToOne} from "typeorm";
 import { Length, IsNotEmpty, MinLength, MaxLength, Validate } from "class-validator";
 import * as bcrypt from "bcryptjs";
+import { Role } from "../../auth/entities/role.entity";
 
 @Entity('users')
 export class User {
@@ -31,7 +32,7 @@ export class User {
 
     @Column()
     @IsNotEmpty()
-    role_id: number;
+    roleId: number;
 
     @Column()
     @Length(4, 100)
@@ -44,6 +45,9 @@ export class User {
     @Column()
     @UpdateDateColumn()
     updated_at: Date;
+
+    @ManyToOne(() => Role, (role) => role.users)
+    role: Role
 
     hashPassword() {
         this.password = bcrypt.hashSync(this.password, 8);

@@ -1,4 +1,5 @@
 import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -11,6 +12,8 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthService } from './module/auth/auth.service';
 import { UsersService } from './module/users/users.service';
 import { User } from './module/users/entities/user.entity';
+import { Role } from './module/auth/entities/role.entity';
+import { AuthGuard } from './guard/auth.guard';
 
 @Module({
   imports: [
@@ -24,7 +27,7 @@ import { User } from './module/users/entities/user.entity';
       username: 'root',
       password: '',
       database: 'nestjs_learn',
-      entities: [User],
+      entities: [User, Role],
       synchronize: false,
       cache: true,
     }),
@@ -32,15 +35,20 @@ import { User } from './module/users/entities/user.entity';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService, 
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard
+    }],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(checkJwt)
       .exclude(
-      { path: 'auth/login', method: RequestMethod.POST },
-      { path: 'auth/register', method: RequestMethod.POST },
+      { path: 'api/auth/login', method: RequestMethod.POST },
+      { path: 'api/auth/register', method: RequestMethod.POST },
         //'auth/(.*)',
       )
       .forRoutes(AuthController, UsersController);

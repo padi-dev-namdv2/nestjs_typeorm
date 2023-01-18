@@ -1,9 +1,10 @@
 import { MigrationInterface, QueryRunner, Table } from "typeorm"
 
-export class $npmConfigName1673863729477 implements MigrationInterface {
+export class $npmConfigName1674035279836 implements MigrationInterface {
+
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.createTable(new Table({
-            name: "users",
+            name: "rolepermissions",
             columns: [
                 {
                     name: 'id',
@@ -13,43 +14,29 @@ export class $npmConfigName1673863729477 implements MigrationInterface {
                     generationStrategy: 'increment',
                 },
                 {
-                    name: "name",
-                    type: "varchar",
+                    name: "roleId",
+                    type: "int",
                 },
                 {
-                    name: "email",
-                    type: "varchar",
-                    isUnique: true
-                },
-                {
-                    name: "password",
-                    type: "varchar",
-                },
-                {
-                    name: "guard",
-                    type: "varchar",
-                },
-                {
-                    name: 'roleId',
-                    type: 'int',
-                    default: '0'
+                    name: "permissionId",
+                    type: "int"
                 },
                 {
                     name: 'created_at',
                     type: 'datetime',
-                    default: 'now()',
+                    default: 'now()'
                 },
                 {
                     name: 'updated_at',
                     type: 'datetime',
-                    default: 'now()',
-                },
+                    default: 'now()'
+                }
             ]
-        }), true);
+        }), true)
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.dropTable("users");
+        await queryRunner.dropTable("rolepermissions");
     }
 
 }
