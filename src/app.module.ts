@@ -14,7 +14,9 @@ import { UsersService } from './module/users/users.service';
 import { User } from './module/users/entities/user.entity';
 import { Role } from './module/auth/entities/role.entity';
 import { Permission } from './module/auth/entities/permission.entity';
+import { RolePermission } from './module/auth/entities/rolepermission.entity';
 import { AuthGuard } from './guard/auth.guard';
+import { DataSource } from 'typeorm';
 
 @Module({
   imports: [
@@ -28,7 +30,7 @@ import { AuthGuard } from './guard/auth.guard';
       username: 'root',
       password: '',
       database: 'nestjs_learn',
-      entities: [User, Role, Permission],
+      entities: [User, Role, Permission, RolePermission],
       synchronize: false,
       cache: true,
     }),
@@ -44,6 +46,7 @@ import { AuthGuard } from './guard/auth.guard';
     }],
 })
 export class AppModule implements NestModule {
+  // constructor(public dataSource: DataSource) {}
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(checkJwt)

@@ -10,13 +10,18 @@ const bcrypt = require("bcrypt");
 import config from "../../../src/config/index.config";
 import { Role } from './entities/role.entity';
 import { AppDataSource } from 'typeOrm.config';
+import { RolePermission } from './entities/rolepermission.entity';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
+    private readonly dataSource: DataSource,
     private readonly usersService: UsersService,
     @InjectRepository(Role)
-    private readonly rolesRepository: Repository<Role>) {
+    private readonly rolesRepository: Repository<Role>,
+    @InjectRepository(RolePermission)
+    private readonly rolePermissionRepository: Repository<RolePermission>) {
   }
 
   async login(loginAuthDto: LoginAuthDto) {
@@ -66,13 +71,37 @@ export class AuthService {
   }
 
   async addRole(params: any) {
-    const queryRunner = AppDataSource.createQueryRunner();
-    console.log(params);
-    // await queryRunner.startTransaction();
-    // try {
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      const role = this.rolesRepository.create({
+        name: params.name
+      })
+      // await this.rolesRepository.save(role);
+      await queryRunner.manager.save(role);
+      // console.log(params.list_permissions);
+      if (Object.keys(params.list_permissions).length) {
+        const rolePermissions = Object(params.list_permissions).map(async function (item: number) {
+          const rolepermissions = this.rolePermissionRepository.create({
+            roleId: role.id,
+            permissionId: item
+          })
 
-    // } catch (err) {
+          await queryRunner.manager.save(rolePermissions);
+        });
 
-    // }
+        // const rolepermissions = this.rolePermissionRepository.create(rolePermissions);
+        // Object.keys(rolePermissions).forEach(async function (index) {
+        //   
+        // })
+      }
+      await queryRunner.commitTransaction()
+      return {result: true, message: 'Create success!'};
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      console.log(err);
+      return {result: false, message: 'Create fail!'};
+    }
   }
 }

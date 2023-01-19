@@ -1,23 +1,15 @@
 import { DataSource } from 'typeorm'
 import { Seeder, SeederFactoryManager } from 'typeorm-extension'
 import { Permission } from '../../module/auth/entities/permission.entity';
-import { Repository } from 'typeorm';
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 
-@Injectable()
 export class PermissionSeeder implements Seeder {
-    constructor(
-        @InjectRepository(Permission)
-    private readonly permissionRepository: Repository<Permission>
-    ) {
-    }
 	async run(
 		dataSource: DataSource,
 		factoryManager: SeederFactoryManager
 	): Promise<void> {
+        const permissionRepository = dataSource.getRepository(Permission);
         const listPermissions: Array<object> = this.getPermissions();
-        await this.permissionRepository.insert(listPermissions);
+        await permissionRepository.insert(listPermissions);
 	}
 
     getPermissions() {

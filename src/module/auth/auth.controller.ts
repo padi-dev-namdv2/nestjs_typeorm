@@ -42,7 +42,8 @@ export class AuthController extends BaseController {
 
   @Post('add-role')
   async addRole(@Body() createRoleDto: CreateRoleDto, @Res() res: Response) {
-    // const addRole = await this.authService.addRole(createRoleDto);
+    // console.log(createRoleDto);
+    const addRole = await this.authService.addRole(createRoleDto);
 
     return this.withData(res);
   }
