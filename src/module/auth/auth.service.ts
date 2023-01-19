@@ -9,6 +9,7 @@ import * as jwt from "jsonwebtoken";
 const bcrypt = require("bcrypt");
 import config from "../../../src/config/index.config";
 import { Role } from './entities/role.entity';
+import { AppDataSource } from 'typeOrm.config';
 
 @Injectable()
 export class AuthService {
@@ -65,6 +66,13 @@ export class AuthService {
   }
 
   async addRole(params: any) {
-    
+    const queryRunner = AppDataSource.createQueryRunner();
+    console.log(params);
+    // await queryRunner.startTransaction();
+    // try {
+
+    // } catch (err) {
+
+    // }
   }
 }

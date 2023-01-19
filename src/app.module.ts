@@ -13,6 +13,7 @@ import { AuthService } from './module/auth/auth.service';
 import { UsersService } from './module/users/users.service';
 import { User } from './module/users/entities/user.entity';
 import { Role } from './module/auth/entities/role.entity';
+import { Permission } from './module/auth/entities/permission.entity';
 import { AuthGuard } from './guard/auth.guard';
 
 @Module({
@@ -27,7 +28,7 @@ import { AuthGuard } from './guard/auth.guard';
       username: 'root',
       password: '',
       database: 'nestjs_learn',
-      entities: [User, Role],
+      entities: [User, Role, Permission],
       synchronize: false,
       cache: true,
     }),
