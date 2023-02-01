@@ -17,6 +17,7 @@ import { Permission } from './module/auth/entities/permission.entity';
 import { RolePermission } from './module/auth/entities/rolepermission.entity';
 import { AuthGuard } from './guard/auth.guard';
 import { DataSource } from 'typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -36,17 +37,18 @@ import { DataSource } from 'typeorm';
     }),
     UsersModule,
     AuthModule,
+    ScheduleModule.forRoot()
   ],
   controllers: [AppController],
   providers: [
-    AppService, 
+    AppService,
     {
       provide: APP_GUARD,
       useClass: AuthGuard
-    }],
+    },
+  ],
 })
 export class AppModule implements NestModule {
-  // constructor(public dataSource: DataSource) {}
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(checkJwt)

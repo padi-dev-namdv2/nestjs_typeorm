@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Req, ValidationPipe, UsePipes } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { RegisterAuthDto } from './dto/register-auth.dto';
@@ -40,11 +40,12 @@ export class AuthController extends BaseController {
     return this.withData(res, listRoles);
   }
 
+  @UsePipes(new ValidationPipe({ transform: true }))
   @Post('add-role')
   async addRole(@Body() createRoleDto: CreateRoleDto, @Res() res: Response) {
-    // console.log(createRoleDto);
+    console.log(createRoleDto);
     const addRole = await this.authService.addRole(createRoleDto);
 
-    return this.withData(res);
+    return addRole.result ? this.withData(res) : this.clientError(res, addRole.message);
   }
 }

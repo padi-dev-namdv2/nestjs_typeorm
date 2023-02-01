@@ -1,7 +1,13 @@
-import { IsEmail, IsNotEmpty, MaxLength, MinLength } from 'class-validator';
+import { IsNotEmpty, MaxLength, MinLength, IsString, IsArray, IsInt } from 'class-validator';
+import { Type, Transform } from 'class-transformer';
 export class CreateRoleDto {
-    @IsNotEmpty()
-    @MinLength(3)
+    @IsString()
     @MaxLength(255)
+    @MinLength(6)
     name: string;
+
+    @IsArray()
+    @Type(() => Number)
+    @IsInt({ each: true })
+    list_permissions: number[];
 }
