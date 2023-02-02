@@ -18,6 +18,8 @@ import { RolePermission } from './module/auth/entities/rolepermission.entity';
 import { AuthGuard } from './guard/auth.guard';
 import { DataSource } from 'typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
+import { TasksService } from './app/cronjobs/task.cronjob';
+import { CacheModule } from '@nestjs/common';
 
 @Module({
   imports: [
@@ -37,7 +39,8 @@ import { ScheduleModule } from '@nestjs/schedule';
     }),
     UsersModule,
     AuthModule,
-    ScheduleModule.forRoot()
+    ScheduleModule.forRoot(),
+    CacheModule.register(),
   ],
   controllers: [AppController],
   providers: [
@@ -46,6 +49,7 @@ import { ScheduleModule } from '@nestjs/schedule';
       provide: APP_GUARD,
       useClass: AuthGuard
     },
+    TasksService
   ],
 })
 export class AppModule implements NestModule {

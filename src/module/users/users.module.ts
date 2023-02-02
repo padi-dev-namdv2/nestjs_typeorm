@@ -7,6 +7,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { QueueMailService } from '../../app/queues/producers/sendMail.producer';
 import { SendMailConsumer } from '../../app/queues/consumers/sendMail.consumer';
 import { BullModule } from '@nestjs/bull';
+import { MulterModule } from '@nestjs/platform-express/multer';
+import { fileUploadOptions } from 'src/config/imageOption.config';
 
 @Module({
   imports: [
@@ -19,7 +21,8 @@ import { BullModule } from '@nestjs/bull';
     }),
     BullModule.registerQueue({
       name:'process-mail-queue'
-    })
+    }),
+    MulterModule.register(fileUploadOptions('user'))
   ],
   controllers: [UsersController],
   providers: [UsersService, QueueMailService, SendMailConsumer],

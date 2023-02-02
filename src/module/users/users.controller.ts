@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Req, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Req, Put, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -6,6 +6,9 @@ import { Response } from 'express';
 import { BaseController } from 'src/app/controller/base.controller';
 import { User } from './entities/user.entity';
 import { QueueMailService } from '../../app/queues/producers/sendMail.producer'
+import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express/multer';
+import { fileUploadOptions } from 'src/config/imageOption.config';
 
 @Controller('api/users')
 export class UsersController extends BaseController {
@@ -14,9 +17,11 @@ export class UsersController extends BaseController {
     super();
   }
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  @Post('/create')
+  @UseInterceptors(FileInterceptor('avatar', fileUploadOptions('user')))
+  create(@UploadedFile() avatar, @Body() createUserDto: CreateUserDto) {
+    console.log(avatar);
+    // return this.usersService.create(createUserDto);
   }
 
   @Get('/list')
@@ -37,16 +42,16 @@ export class UsersController extends BaseController {
   @Get('by-id/:id')
   async findOne(@Param('id') id: number, @Res() res: Response) {
     const user = this.usersService.findOne(id);
-console.log('aikfhakfhakhakghal');
+
     return user ? this.withData(res, user) : this.notFound(res);
   }
 
-  @Put(':id')
+  @Put('update/:id')
   update(@Param('id') id: number, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }
 
-  @Delete(':id')
+  @Delete('delete/:id')
   async remove(@Param('id') id: number, @Res() res: Response) {
     const deleteUser = await this.usersService.remove(id);
 
