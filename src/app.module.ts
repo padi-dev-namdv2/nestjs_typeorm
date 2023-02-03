@@ -20,6 +20,8 @@ import { DataSource } from 'typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksService } from './app/cronjobs/task.cronjob';
 import { CacheModule } from '@nestjs/common';
+import { HttpExceptionFilter } from './app/exceptions/filter.exception';
+import { APP_FILTER } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -49,7 +51,7 @@ import { CacheModule } from '@nestjs/common';
       provide: APP_GUARD,
       useClass: AuthGuard
     },
-    TasksService
+    TasksService,
   ],
 })
 export class AppModule implements NestModule {

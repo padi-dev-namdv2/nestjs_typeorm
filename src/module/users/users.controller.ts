@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Req, Put, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Req, Put, UploadedFile, UploadedFiles, UseInterceptors, Header } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -9,19 +9,33 @@ import { QueueMailService } from '../../app/queues/producers/sendMail.producer'
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FilesInterceptor } from '@nestjs/platform-express/multer';
 import { fileUploadOptions } from 'src/config/imageOption.config';
+import { HttpExceptionFilter } from 'src/app/exceptions/filter.exception';
+import { UseFilters } from '@nestjs/common';
+import { HttpException } from '@nestjs/common';
+import { HttpStatus } from '@nestjs/common';
+import { ParseFilePipe } from '@nestjs/common';
+import { MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
+import { FileFieldsInterceptor } from '@nestjs/platform-express/multer';
+import { ExcelService } from 'src/app/excel/export/user.export';
+import { excelUploadOptions } from 'src/config/excel.config';
 
 @Controller('api/users')
 export class UsersController extends BaseController {
   constructor(private readonly usersService: UsersService,
-    private readonly queueMailService: QueueMailService) {
+    private readonly queueMailService: QueueMailService,
+    private excelService: ExcelService) {
     super();
   }
 
   @Post('/create')
-  @UseInterceptors(FileInterceptor('avatar', fileUploadOptions('user')))
-  create(@UploadedFile() avatar, @Body() createUserDto: CreateUserDto) {
-    console.log(avatar);
-    // return this.usersService.create(createUserDto);
+  @UseInterceptors(FileFieldsInterceptor([
+    { name: 'avatars', maxCount: 10 },
+    { name: 'thumb', maxCount: 1 }
+  ]))
+  create(@UploadedFiles() files: { avatar?: Express.Multer.File[], thumb?: Express.Multer.File }, @Body() createUserDto: CreateUserDto) {
+    console.log(files.thumb[0].path);
+    // throw new HttpException('File is not allowed!', HttpStatus.INTERNAL_SERVER_ERROR);
+    return this.usersService.create(createUserDto);
   }
 
   @Get('/list')
@@ -62,5 +76,19 @@ export class UsersController extends BaseController {
   async sendMailTest(@Res() res: Response) {
     await this.queueMailService.sendMailTest("kakitani2000@gmail.com", "Chào bạn!Tôi đang test mail");
     return this.withData(res);
+  }
+
+  @Get('/export-user')
+  async exportExcel(@Res() res: Response) {
+    const result = await this.excelService.userExport();
+    
+    console.log(result);
+    return res.download(`${result}`);
+  }
+
+  @Post('/import-user')
+  // @UseInterceptors(FileInterceptor('file', excelUploadOptions()))
+  async importUser(@Body() test) {
+    console.log(test);
   }
 }

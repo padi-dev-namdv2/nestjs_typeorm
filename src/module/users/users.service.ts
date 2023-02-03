@@ -8,6 +8,8 @@ import { Role } from '../auth/entities/role.entity';
 import { Response } from '@nestjs/common';
 import { IsNull, Not, In } from 'typeorm';
 import { DataSource } from 'typeorm';
+import { HttpException } from '@nestjs/common';
+import { HttpStatus } from '@nestjs/common';
 
 @Injectable()
 export class UsersService {
@@ -19,7 +21,8 @@ export class UsersService {
   }
 
   create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+    // throw new HttpException('Not Fount', HttpStatus.NOT_FOUND);
+    return 'hello user create new!';
   }
 
   async findAll(params: any) {
