@@ -10,6 +10,7 @@ import { BullModule } from '@nestjs/bull';
 import { MulterModule } from '@nestjs/platform-express/multer';
 import { fileUploadOptions } from 'src/config/imageOption.config';
 import { ExcelService } from '../../app/excel/export/user.export';
+import { ImportUser } from 'src/app/excel/import/user.import';
 
 @Module({
   imports: [
@@ -26,7 +27,7 @@ import { ExcelService } from '../../app/excel/export/user.export';
     MulterModule.register(fileUploadOptions('user'))
   ],
   controllers: [UsersController],
-  providers: [UsersService, QueueMailService, SendMailConsumer, ExcelService],
+  providers: [UsersService, QueueMailService, SendMailConsumer, ExcelService, ImportUser],
   exports: [UsersService]
 })
 export class UsersModule {}

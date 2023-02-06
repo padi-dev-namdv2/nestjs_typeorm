@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Req, Put, UploadedFile, UploadedFiles, UseInterceptors, Header } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Req, Put, UploadedFile, UploadedFiles, UseInterceptors, Headers } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -18,12 +18,15 @@ import { MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express/multer';
 import { ExcelService } from 'src/app/excel/export/user.export';
 import { excelUploadOptions } from 'src/config/excel.config';
+import { ImportUser } from 'src/app/excel/import/user.import';
+import path, { join } from 'path';
 
 @Controller('api/users')
 export class UsersController extends BaseController {
   constructor(private readonly usersService: UsersService,
     private readonly queueMailService: QueueMailService,
-    private excelService: ExcelService) {
+    private excelService: ExcelService,
+    private importUser: ImportUser) {
     super();
   }
 
@@ -87,8 +90,8 @@ export class UsersController extends BaseController {
   }
 
   @Post('/import-user')
-  // @UseInterceptors(FileInterceptor('file', excelUploadOptions()))
-  async importUser(@Body() test) {
-    console.log(test);
+  @UseInterceptors(FileInterceptor('file', excelUploadOptions()))
+  async importUserExcel(@UploadedFile() file: Express.Multer.File, @Res() res: Response) {
+    const importExcel = await this.importUser.importUser(file.path);
   }
 }

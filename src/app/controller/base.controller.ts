@@ -46,7 +46,7 @@ export abstract class BaseController {
     });
   }
 
-  public withData<T> (res: express.Response, dto?: T, message?: string) {
+  public withData<T> (res: express.Response, dto?: T, message?: Array<string>|string) {
     if (!!dto) {
       res.type('application/json');
       return res.status(200).json({

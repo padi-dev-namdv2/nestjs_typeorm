@@ -48,6 +48,7 @@
     "class-validator": "^0.14.0",
     "exceljs": "^4.3.0",
     "express-session": "^1.17.3",
+    "fs": "^0.0.1-security",
     "fs.promises": "^0.1.2",
     "helmet": "^6.0.1",
     "jsonwebtoken": "^9.0.0",
@@ -56,6 +57,7 @@
     "mysql": "^2.18.1",
     "mysql2": "^2.3.3",
     "nodemailer": "^6.9.1",
+    "read-excel-file": "^5.6.0",
     "reflect-metadata": "^0.1.13",
     "routing-controllers": "^0.10.1",
     "rxjs": "^7.8.0",
@@ -64,6 +66,7 @@
     "typeorm": "^0.3.11",
     "typeorm-extension": "^2.4.1",
     "typeorm-seeding": "^1.6.1",
+    "util": "^0.12.5",
     "validatorjs": "^3.22.1",
     "xlsx": "^0.18.5"
   },
