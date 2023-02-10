@@ -32,7 +32,7 @@ export abstract class BaseController {
 //     }
 //   }
 
-  public jsonResponse (res: express.Response, code: number, message: string, success: boolean) {
+  public jsonResponse (res: express.Response, code: number, message: Array<string>|string, success: boolean) {
     if (code != 200 && code != 201) {
       return res.status(code).json({
         statusCode: code,
@@ -74,7 +74,7 @@ export abstract class BaseController {
     return this.jsonResponse(res, 201, message ? message : 'Creted Success!', false);
   }
 
-  public clientError (res: express.Response, message?: string) {
+  public clientError (res: express.Response, message?: Array<string>|string) {
     return this.jsonResponse(res, 400, message ? message : 'Unauthorized', false);
   }
 

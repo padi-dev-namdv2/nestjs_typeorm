@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToMany} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToMany, JoinTable} from "typeorm";
 import { Length, IsNotEmpty, MinLength, MaxLength, Validate } from "class-validator";
 import * as bcrypt from "bcryptjs";
 import { User } from "../../users/entities/user.entity";
@@ -30,5 +30,18 @@ export class Role {
     users: User
 
     @ManyToMany(() => Permission, (permissions) => permissions.roles)
-    permissions: Permission
+    @JoinTable(
+        {
+            name: 'rolepermissions',
+            joinColumn: {
+              name: 'roleId',
+              referencedColumnName: 'id',
+            },
+            inverseJoinColumn: {
+              name: 'permissionId',
+              referencedColumnName: 'id',
+            }
+        }
+    )
+    permissions: Permission[]
 }

@@ -11,14 +11,16 @@ import { MulterModule } from '@nestjs/platform-express/multer';
 import { fileUploadOptions } from 'src/config/imageOption.config';
 import { ExcelService } from '../../app/excel/export/user.export';
 import { ImportUser } from 'src/app/excel/import/user.import';
+import { Helper } from 'src/ultils/helper.ultil';
+import { redisOptions } from 'src/config/redis.config';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Role]),
     BullModule.forRoot({
       redis: {
-        host: 'localhost',
-        port: 6379,
+        host: redisOptions.host,
+        port: redisOptions.post,
       },
     }),
     BullModule.registerQueue({
@@ -27,7 +29,7 @@ import { ImportUser } from 'src/app/excel/import/user.import';
     MulterModule.register(fileUploadOptions('user'))
   ],
   controllers: [UsersController],
-  providers: [UsersService, QueueMailService, SendMailConsumer, ExcelService, ImportUser],
+  providers: [UsersService, QueueMailService, SendMailConsumer, ExcelService, ImportUser, Helper],
   exports: [UsersService]
 })
 export class UsersModule {}

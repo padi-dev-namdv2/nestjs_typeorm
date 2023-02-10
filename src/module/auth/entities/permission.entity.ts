@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, ManyToMany} from "typeorm";
 import { Length, IsNotEmpty, MinLength, MaxLength, Validate } from "class-validator";
 import { Role } from "./role.entity";
+import { JoinTable } from "typeorm";
 
 @Entity('permissions')
 export class Permission {
@@ -35,5 +36,6 @@ export class Permission {
     updated_at: Date;
 
     @ManyToMany(() => Role, (roles) => roles.permissions)
-    roles: Role
+    @JoinTable()
+    roles: Role[]
 }

@@ -22,27 +22,60 @@ import { TasksService } from './app/cronjobs/task.cronjob';
 import { CacheModule } from '@nestjs/common';
 import { HttpExceptionFilter } from './app/exceptions/filter.exception';
 import { APP_FILTER } from '@nestjs/core';
+import { Helper } from './ultils/helper.ultil';
+import { CategoriesModule } from './module/categories/categories.module';
+import { PagesModule } from './module/pages/pages.module';
+import { PagesController } from './module/pages/pages.controller';
+import { redisStore } from 'cache-manager-redis-store';
+import type { RedisClientOptions } from 'redis';
+import { ConfigService } from '@nestjs/config';
+import { CacheStore } from '@nestjs/common';
+import { Page } from './module/pages/entities/page.entity';
+import { Category } from './module/categories/entities/category.entity';
+import { Flaggedrev } from './module/categories/entities/flaggedrev.entity';
+import { redisOptions } from './config/redis.config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    TypeOrmModule.forFeature([User, Role]),
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
       port: 3306,
       username: 'root',
       password: '',
-      database: 'nestjs_learn',
-      entities: [User, Role, Permission, RolePermission],
+      database: 'employees',
+      entities: [User, Role, Permission, RolePermission, Category, Flaggedrev, Page],
       synchronize: false,
       cache: true,
     }),
     UsersModule,
     AuthModule,
     ScheduleModule.forRoot(),
-    CacheModule.register(),
+    CacheModule.registerAsync({
+      isGlobal: true,
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => {
+        const store = await redisStore({
+          socket: {
+            host: redisOptions.host,
+            port: redisOptions.post,
+          },
+          password: null,
+        });
+    
+        return {
+          store: store as unknown as CacheStore,
+          ttl: 60 * 60 * 24 * 7,
+        };
+      },
+    }),
+    PagesModule,
+    CategoriesModule
   ],
   controllers: [AppController],
   providers: [
@@ -52,6 +85,7 @@ import { APP_FILTER } from '@nestjs/core';
       useClass: AuthGuard
     },
     TasksService,
+    Helper
   ],
 })
 export class AppModule implements NestModule {
@@ -63,6 +97,6 @@ export class AppModule implements NestModule {
       { path: 'api/auth/register', method: RequestMethod.POST },
         //'auth/(.*)',
       )
-      .forRoutes(AuthController, UsersController);
+      .forRoutes(AuthController, UsersController, PagesController);
   }
 }

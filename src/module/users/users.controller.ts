@@ -93,5 +93,7 @@ export class UsersController extends BaseController {
   @UseInterceptors(FileInterceptor('file', excelUploadOptions()))
   async importUserExcel(@UploadedFile() file: Express.Multer.File, @Res() res: Response) {
     const importExcel = await this.importUser.importUser(file.path);
+
+    return importExcel.result ? this.withData(res, importExcel.message) : this.clientError(res, importExcel.message);
   }
 }
