@@ -2,7 +2,7 @@ import { Injectable, Res, Req } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Repository } from 'typeorm';
+import { Brackets, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { Role } from '../auth/entities/role.entity';
 import { Response } from '@nestjs/common';
@@ -92,10 +92,32 @@ export class UsersService {
   }
 
   async getAllQueryBuilder(params: any) {
-    const limitRow = 5;
-    const offset = params.page ? (params.page - 1) * limitRow : 0;
+    const limitRow = 3;
+    const page = params.page ? (params.page - 1) * limitRow : 1;
+    const testAVG = this.dataSource.getRepository(User)
+      .createQueryBuilder("user")
+      .select("AVG(user.roleId) as avg_roleId")
+      .getQuery();
+
+    console.log(testAVG);
+    
     const listUser = await this.dataSource.getRepository(User)
-      .createQueryBuilder("user").innerJoinAndSelect("user.role", "role").getMany();
-    console.log(listUser);
+      .createQueryBuilder("user")
+      .leftJoinAndSelect("user.role", "role")
+      .select(["user.id", "user.name", "user.email"])
+      .addSelect(["role.id", "role.name"])
+      .where('role.id is NOT NULL')
+      .andWhere(
+        new Brackets((query) => {
+          query.where('role.name = :name1 OR role.name = :name2' , 
+            { name1: 'Blogger', name2: 'CTV' }
+          )
+        })
+      )
+      .skip((page - 1) * limitRow)
+      .take(limitRow)
+      .getManyAndCount();
+    
+    return { result: listUser, message: 'Get user success!' }
   }
 }

@@ -6,12 +6,16 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Page } from './entities/page.entity';
 import { Cache } from 'cache-manager';
 import { CacheTTL } from '@nestjs/common';
+import { CacheInterceptor } from '@nestjs/common/cache';
+import { UseInterceptors } from '@nestjs/common/decorators';
+import { Helper } from 'src/ultils/helper.ultil';
 
 @Injectable()
 export class PagesService {
   constructor(@InjectRepository(Page)
     private readonly pageRepository: Repository<Page>,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly helperService: Helper
   ) {
 
   }
@@ -20,7 +24,6 @@ export class PagesService {
     return 'This action adds a new page';
   }
 
-  @CacheTTL(2000)
   async findAll(params: any) {
     let key: string = 'list_user_page_' + params.page ?? '1';
     const limitRow = 30;
@@ -51,7 +54,7 @@ export class PagesService {
       skip: offset,
     })
 
-    await this.cacheManager.set(key, listPages, 60 * 60);
+    await this.cacheManager.set(key, listPages, { ttl: 30 } as any);
     return { result: listPages, message: 'Get list pages success!' };
   }
 

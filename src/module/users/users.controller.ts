@@ -53,7 +53,7 @@ export class UsersController extends BaseController {
     console.log("test");
     const listUser = await this.usersService.getAllQueryBuilder(req.query);
 
-    return this.withData(res);
+    return listUser.result ? this.withData(res, listUser.result) : this.clientError(res);
   }
 
   @Get('by-id/:id')

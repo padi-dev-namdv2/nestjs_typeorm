@@ -1,4 +1,4 @@
-import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer, RequestMethod, CacheModuleOptions } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -34,11 +34,13 @@ import { Page } from './module/pages/entities/page.entity';
 import { Category } from './module/categories/entities/category.entity';
 import { Flaggedrev } from './module/categories/entities/flaggedrev.entity';
 import { redisOptions } from './config/redis.config';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: ".env"
     }),
     TypeOrmModule.forFeature([User, Role]),
     TypeOrmModule.forRoot({
@@ -46,7 +48,7 @@ import { redisOptions } from './config/redis.config';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: '',
+      password: 'nam_do',
       database: 'employees',
       entities: [User, Role, Permission, RolePermission, Category, Flaggedrev, Page],
       synchronize: false,
@@ -66,11 +68,10 @@ import { redisOptions } from './config/redis.config';
             port: redisOptions.post,
           },
           password: null,
+          ttl: 60
         });
-    
         return {
           store: store as unknown as CacheStore,
-          ttl: 60 * 60 * 24 * 7,
         };
       },
     }),
@@ -85,7 +86,7 @@ import { redisOptions } from './config/redis.config';
       useClass: AuthGuard
     },
     TasksService,
-    Helper
+    Helper,
   ],
 })
 export class AppModule implements NestModule {

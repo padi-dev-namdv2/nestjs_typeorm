@@ -9,6 +9,6 @@ export class MainSeeder implements Seeder {
 		factoryManager: SeederFactoryManager
 	): Promise<void> {
 		await runSeeder(dataSource, UserSeeder);
-		await runSeeder(dataSource, PermissionSeeder);
+		// await runSeeder(dataSource, PermissionSeeder);
 	}
 }
