@@ -7,15 +7,17 @@ import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
 import * as jwt from 'jsonwebtoken';
 const bcrypt = require('bcrypt');
-import config from '../../../src/config/index.config';
 
 @Injectable()
 export class AuthService {
   constructor(
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
     private readonly usersService: UsersService,
   ) {}
 
   async login(loginAuthDto: LoginAuthDto) {
+    // await this.usersRepository.softDelete(34);
     const checkEmptyUser = await this.usersService.findByEmail(
       loginAuthDto.email,
     );
@@ -38,7 +40,7 @@ export class AuthService {
         name: checkEmptyUser.name,
         email: checkEmptyUser.email,
       },
-      config.jwtSecret,
+      process.env.JWT_SECRET,
       { expiresIn: '1h' },
     );
 

@@ -6,7 +6,7 @@ import { config } from 'dotenv';
 
 config({ path: `.env` });
 
-const options: DataSourceOptions = {
+const options: DataSourceOptions & SeederOptions = {
     type: "mysql",
     host: process.env.MYSQL_HOST,
     port: process.env.MYSQL_POST ? parseInt(process.env.MYSQL_POST) : undefined,
@@ -23,6 +23,8 @@ const options: DataSourceOptions = {
     ],
     subscribers: [],
     cache: true,
+    seeds: [MainSeeder],
+    factories: ['src/database/factory/**/*{.ts,.js}'],
 };
-console.log(process.env.MYSQL_HOST);
+
 export const AppDataSource = new DataSource(options)

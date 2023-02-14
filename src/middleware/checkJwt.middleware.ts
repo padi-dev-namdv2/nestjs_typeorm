@@ -1,13 +1,12 @@
 import { Request, Response, NextFunction } from "express";
 import * as jwt from "jsonwebtoken";
-import config from "../config/index.config";
 
 export const checkJwt = (req: Request, res: Response, next: NextFunction) => {
     const token = <string>req.headers["x-api-key"];
     let jwtPayload;
 
     try {
-        jwtPayload = <any>jwt.verify(token, config.jwtSecret);
+        jwtPayload = <any>jwt.verify(token, process.env.JWT_SECRET);
         res.locals.jwtPayload = jwtPayload;
     } catch (error) {
         res.status(401).json({
@@ -19,7 +18,7 @@ export const checkJwt = (req: Request, res: Response, next: NextFunction) => {
     }
 
     const { id, name, email } = jwtPayload;
-    const newToken = jwt.sign({ id, name, email }, config.jwtSecret, {
+    const newToken = jwt.sign({ id, name, email }, process.env.JWT_SECRET, {
         expiresIn: "1h"
     });
     res.setHeader("x-api-key", newToken);

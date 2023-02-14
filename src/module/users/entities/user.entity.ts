@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, ManyToOne} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, ManyToOne, DeleteDateColumn} from "typeorm";
 import { Length, IsNotEmpty, MinLength, MaxLength, Validate } from "class-validator";
 import { JoinTable, JoinColumn } from "typeorm";
 
@@ -36,4 +36,8 @@ export class User {
     @Column()
     @UpdateDateColumn()
     updated_at: Date;
+
+    @Column()
+    @DeleteDateColumn()
+    deleted_at: Date
 }

@@ -19,6 +19,7 @@ import { Helper } from './ultils/helper.ultil';
 import { redisStore } from 'cache-manager-redis-store';
 import { ConfigService } from '@nestjs/config';
 import { CacheStore } from '@nestjs/common';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler'
 
 @Module({
   imports: [
@@ -41,6 +42,10 @@ import { CacheStore } from '@nestjs/common';
     UsersModule,
     AuthModule,
     ScheduleModule.forRoot(),
+    ThrottlerModule.forRoot({
+      ttl: process.env.THROTTLER_TTL ? parseInt(process.env.THROTTLER_TTL) : undefined,
+      limit: process.env.THROTTLER_LIMIT ? parseInt(process.env.THROTTLER_LIMIT) : undefined,
+    }),
     CacheModule.registerAsync({
       isGlobal: true,
       imports: [ConfigModule],
@@ -67,6 +72,10 @@ import { CacheStore } from '@nestjs/common';
       provide: APP_GUARD,
       useClass: AuthGuard
     },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    },    
     TasksService,
     Helper,
   ],
