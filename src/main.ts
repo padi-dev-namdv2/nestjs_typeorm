@@ -18,6 +18,7 @@ async function bootstrap() {
       saveUninitialized: false,
     }),
   );
+  console.log(process.env.MYSQL_USER);
   app.use("/upload", express.static("upload"));
   await app.listen(3001);
 }

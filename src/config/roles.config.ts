@@ -13,7 +13,7 @@ export default {
                 name: 'Create User'
             },
             {
-                path: 'api/users/get-one/:id',
+                path: 'api/users/find-one/:id',
                 method: 'GET',
                 name: 'User Detail'
             },

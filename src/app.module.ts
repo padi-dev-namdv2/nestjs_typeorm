@@ -19,7 +19,6 @@ import { Helper } from './ultils/helper.ultil';
 import { redisStore } from 'cache-manager-redis-store';
 import { ConfigService } from '@nestjs/config';
 import { CacheStore } from '@nestjs/common';
-import { redisOptions } from './config/redis.config';
 
 @Module({
   imports: [
@@ -30,11 +29,11 @@ import { redisOptions } from './config/redis.config';
     TypeOrmModule.forFeature([User]),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: '',
-      database: 'employees',
+      host: process.env.MYSQL_HOST,
+      port: process.env.MYSQL_POST ? parseInt(process.env.MYSQL_POST) : undefined,
+      username: process.env.MYSQL_USER,
+      password: process.env.MYSQL_ROOT_PASSWORD,
+      database: process.env.MYSQL_DB_NAME,
       entities: [User],
       synchronize: false,
       cache: true,
@@ -49,11 +48,11 @@ import { redisOptions } from './config/redis.config';
       useFactory: async () => {
         const store = await redisStore({
           socket: {
-            host: redisOptions.host,
-            port: redisOptions.post,
+            host: process.env.REDIS_HOST,
+            port: process.env.REDIS_POST ? parseInt(process.env.REDIS_POST) : undefined,
           },
-          password: null,
-          ttl: 60
+          password: process.env.REDIS_PASSWORD,
+          ttl: process.env.REDIS_TTL ? parseInt(process.env.REDIS_TTL) : 0
         });
         return {
           store: store as unknown as CacheStore,

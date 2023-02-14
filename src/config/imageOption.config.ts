@@ -10,7 +10,7 @@ const whitelist = [
 ];
 import { Response } from "express";
 
-export const fileUploadOptions: any = (folderName: string) => ({
+export const imageUploadOptions: any = (folderName: string) => ({
     storage: multer.diskStorage({
         destination: (req: any, file: any, cb: any) => {
             cb(null, 'upload/' + folderName);

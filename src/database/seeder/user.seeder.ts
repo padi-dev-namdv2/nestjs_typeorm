@@ -12,6 +12,23 @@ export class UserSeeder implements Seeder {
 		const userRepository = dataSource.getRepository(User)
         const salt = await bcrypt.genSalt(10);
 
+        const defaultUser = await userRepository.findOne({
+            where: {
+                email: 'ahihi@gmail.com'
+            }
+        })
+
+        if (!defaultUser) {
+            const password = await bcrypt.hash('123456', salt)
+            const adminUser = userRepository.create({
+                name: 'namdv',
+                email: 'ahihi@gmail.com',
+                password: password
+            });
+
+            await userRepository.save(adminUser);
+        }
+
         for (var i = 0; i < 10; i++) {
             var userData = await this.randomUser();
             const userExists = await userRepository.findOneBy({ email: userData.email })
@@ -20,7 +37,6 @@ export class UserSeeder implements Seeder {
                 const newUser = userRepository.create(userData)
                 await userRepository.save(newUser)
             }
-            i++;
         }
 	}
 
@@ -29,7 +45,6 @@ export class UserSeeder implements Seeder {
         return {
 			name: 'Guido Cerqueira',
 			email: (Math.random() + 1).toString(36).substring(7) + '@email.com',
-            guard: 'aricle',
 			password: await bcrypt.hash('test1214', salt)
 		};
     }

@@ -7,23 +7,23 @@ import { QueueMailService } from '../../app/queues/producers/sendMail.producer';
 import { SendMailConsumer } from '../../app/queues/consumers/sendMail.consumer';
 import { BullModule } from '@nestjs/bull';
 import { MulterModule } from '@nestjs/platform-express/multer';
-import { fileUploadOptions } from 'src/config/imageOption.config';
+import { imageUploadOptions } from 'src/config/imageOption.config';
 import { Helper } from 'src/ultils/helper.ultil';
-import { redisOptions } from 'src/config/redis.config';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
     BullModule.forRoot({
       redis: {
-        host: redisOptions.host,
-        port: redisOptions.post,
+        host: process.env.REDIS_HOST,
+        port: process.env.REDIS_POST ? parseInt(process.env.REDIS_POST) : undefined,
+        password: process.env.REDIS_PASSWORD
       },
     }),
     BullModule.registerQueue({
       name: 'process-mail-queue'
     }),
-    MulterModule.register(fileUploadOptions('user'))
+    MulterModule.register(imageUploadOptions('user'))
   ],
   controllers: [UsersController],
   providers: [UsersService, QueueMailService, SendMailConsumer, Helper],

@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, Req, ValidationPipe, UsePipes } from '@nestjs/common';
+import { Controller, Post, Body, Res, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginAuthDto } from './dto/login-auth.dto';
 import { RegisterAuthDto } from './dto/register-auth.dto';
-import { BaseController } from 'src/app/controller/base.controller';
+import { BaseController } from 'src/shared/controller/base.controller';
 import { Response } from 'express';
 import * as jwt from "jsonwebtoken";
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -23,29 +23,5 @@ export class AuthController extends BaseController {
   @Post('register')
   register(@Body() registerAuthDto: RegisterAuthDto) {
     return this.authService.register(registerAuthDto);
-  }
-
-  @Post('logout')
-  async logout(@Res() res: Response, @Req() req: Request) {
-    const token = req.headers["x-api-key"];
-      res.clearCookie('x-api-key');
-      
-      return this.withData(res, '', 'Logout Success!');
-  }
-
-  @Get('roles')
-  async listRoles(@Res() res: Response, @Req() req: any) {
-    const listRoles = await this.authService.listRoles(req.query);
-
-    return this.withData(res, listRoles);
-  }
-
-  @UsePipes(new ValidationPipe({ transform: true }))
-  @Post('add-role')
-  async addRole(@Body() createRoleDto: CreateRoleDto, @Res() res: Response) {
-    console.log(createRoleDto);
-    const addRole = await this.authService.addRole(createRoleDto);
-
-    return addRole.result ? this.withData(res) : this.clientError(res, addRole.message);
   }
 }

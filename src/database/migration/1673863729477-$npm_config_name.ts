@@ -26,15 +26,6 @@ export class $npmConfigName1673863729477 implements MigrationInterface {
                     type: "varchar",
                 },
                 {
-                    name: "guard",
-                    type: "varchar",
-                },
-                {
-                    name: 'roleId',
-                    type: 'int',
-                    default: '0'
-                },
-                {
                     name: 'created_at',
                     type: 'datetime',
                     default: 'now()',
@@ -44,6 +35,11 @@ export class $npmConfigName1673863729477 implements MigrationInterface {
                     type: 'datetime',
                     default: 'now()',
                 },
+                {
+                    name: 'deleted_at',
+                    type: 'datetime',
+                    default: 'now()'
+                }
             ]
         }), true);
     }
