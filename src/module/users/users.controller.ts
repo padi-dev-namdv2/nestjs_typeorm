@@ -18,15 +18,12 @@ import { MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express/multer';
 import { ExcelService } from 'src/app/excel/export/user.export';
 import { excelUploadOptions } from 'src/config/excel.config';
-import { ImportUser } from 'src/app/excel/import/user.import';
 import path, { join } from 'path';
 
 @Controller('api/users')
 export class UsersController extends BaseController {
   constructor(private readonly usersService: UsersService,
-    private readonly queueMailService: QueueMailService,
-    private excelService: ExcelService,
-    private importUser: ImportUser) {
+    private readonly queueMailService: QueueMailService) {
     super();
   }
 
@@ -84,7 +81,7 @@ export class UsersController extends BaseController {
   @Get('/export-user')
   async exportExcel(@Res() res: Response) {
     const result = await this.excelService.userExport();
-    
+
     console.log(result);
     return res.download(`${result}`);
   }

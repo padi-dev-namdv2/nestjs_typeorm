@@ -1,6 +1,6 @@
 import "reflect-metadata"
 import { DataSource, DataSourceOptions } from "typeorm"
-import { SeederOptions, SeederFactoryManager } from "typeorm-extension"
+import { SeederOptions } from "typeorm-extension"
 import { MainSeeder } from "./src/database/seeder/main.seeder";
 
 const options: DataSourceOptions & SeederOptions = {

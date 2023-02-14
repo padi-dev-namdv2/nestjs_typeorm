@@ -8,12 +8,12 @@ export default {
                 name: 'List user'
             },
             {
-                path: 'api/users/list',
+                path: 'api/users/list-all',
                 method: 'POST',
                 name: 'Create User'
             },
             {
-                path: 'api/users/by-id/:id',
+                path: 'api/users/get-one/:id',
                 method: 'GET',
                 name: 'User Detail'
             },
@@ -27,21 +27,6 @@ export default {
                 method: 'DELETE',
                 name: 'Delete User'
             },
-            {
-                path: 'api/users/send-mail-test',
-                method: 'GET',
-                name: 'Send mail test'
-            },
-            {
-                path: 'api/users/export-user',
-                method: 'GET',
-                name: 'Export User'
-            },
-            {
-                path: 'api/users/import-user',
-                method: 'POST',
-                name: 'Import User'
-            }
         ]
     },
     auth: {

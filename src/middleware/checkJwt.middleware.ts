@@ -3,10 +3,10 @@ import * as jwt from "jsonwebtoken";
 import config from "../config/index.config";
 
 export const checkJwt = (req: Request, res: Response, next: NextFunction) => {
-    const token = <string>req.headers["x-api-key"]; //Get the jwt token from the head
+    const token = <string>req.headers["x-api-key"];
     let jwtPayload;
 
-    try { //Try to validate the token and get data
+    try {
         jwtPayload = <any>jwt.verify(token, config.jwtSecret);
         res.locals.jwtPayload = jwtPayload;
     } catch (error) {
@@ -18,11 +18,11 @@ export const checkJwt = (req: Request, res: Response, next: NextFunction) => {
         return;
     }
 
-    const { id, name, email } = jwtPayload;  //We want to send a new token on every request
+    const { id, name, email } = jwtPayload;
     const newToken = jwt.sign({ id, name, email }, config.jwtSecret, {
         expiresIn: "1h"
     });
     res.setHeader("x-api-key", newToken);
 
-    next();  //Call the next middleware or controller
+    next();
 };

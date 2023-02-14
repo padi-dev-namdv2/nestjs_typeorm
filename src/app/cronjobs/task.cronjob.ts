@@ -11,16 +11,6 @@ export class TasksService {
     timeZone: 'Asia/Ho_Chi_Minh'
   })
   testCron() {
-    console.log("test-cronjob");
     this.logger.debug('Called when the current second is 45');
-  }
-  
-  @Cron(CronExpression.EVERY_10_SECONDS, {
-    name: 'test-cron-new',
-    timeZone: 'Asia/Ho_Chi_Minh'
-  })
-  testCronNew() {
-    console.log("test-cronjob-new");
-    this.logger.log("Called when the current second is 10")
   }
 }
