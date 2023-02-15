@@ -1,26 +1,23 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class TasksService {
-  private readonly logger = new Logger(TasksService.name);
+  constructor(@Inject('winston')
+    private readonly logger: Logger) {
+  }
 
-  @Cron(CronExpression.EVERY_30_SECONDS, {
+  @Cron(CronExpression.EVERY_10_SECONDS, {
     name: 'test-cron',
-    timeZone: 'Asia/Ho_Chi_Minh'
+    // timeZone: 'Asia/Ho_Chi_Minh'
   })
   testCron() {
-    console.log("test-cronjob");
     this.logger.debug('Called when the current second is 45');
-  }
-  
-  @Cron(CronExpression.EVERY_10_SECONDS, {
-    name: 'test-cron-new',
-    timeZone: 'Asia/Ho_Chi_Minh'
-  })
-  testCronNew() {
-    console.log("test-cronjob-new");
-    this.logger.log("Called when the current second is 10")
+    this.logger.error('The transaction failed.');
+    this.logger.warn("ahiyhi");
+    this.logger.verbose('test');
+    this.logger.log('info', 'test21425');
+    this.logger.log('info', 'test21425');
   }
 }

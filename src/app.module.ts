@@ -1,4 +1,4 @@
-import { Module, NestModule, MiddlewareConsumer, RequestMethod, CacheModuleOptions } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer, RequestMethod } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -9,32 +9,21 @@ import { AuthModule } from './module/auth/auth.module';
 import { AuthController } from './module/auth/auth.controller';
 import { UsersController } from './module/users/users.controller';
 import { ConfigModule } from '@nestjs/config';
-import { AuthService } from './module/auth/auth.service';
-import { UsersService } from './module/users/users.service';
 import { User } from './module/users/entities/user.entity';
-import { Role } from './module/auth/entities/role.entity';
-import { Permission } from './module/auth/entities/permission.entity';
-import { RolePermission } from './module/auth/entities/rolepermission.entity';
 import { AuthGuard } from './guard/auth.guard';
 import { DataSource } from 'typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksService } from './app/cronjobs/task.cronjob';
 import { CacheModule } from '@nestjs/common';
-import { HttpExceptionFilter } from './app/exceptions/filter.exception';
-import { APP_FILTER } from '@nestjs/core';
 import { Helper } from './ultils/helper.ultil';
-import { CategoriesModule } from './module/categories/categories.module';
-import { PagesModule } from './module/pages/pages.module';
-import { PagesController } from './module/pages/pages.controller';
 import { redisStore } from 'cache-manager-redis-store';
-import type { RedisClientOptions } from 'redis';
 import { ConfigService } from '@nestjs/config';
 import { CacheStore } from '@nestjs/common';
-import { Page } from './module/pages/entities/page.entity';
-import { Category } from './module/categories/entities/category.entity';
-import { Flaggedrev } from './module/categories/entities/flaggedrev.entity';
-import { redisOptions } from './config/redis.config';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler'
+import { WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
+const path = require("path");
+import { AppDataSource } from 'typeOrm.config';
 
 @Module({
   imports: [
@@ -42,41 +31,58 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
       isGlobal: true,
       envFilePath: ".env"
     }),
-    TypeOrmModule.forFeature([User, Role]),
+    TypeOrmModule.forFeature([User]),
     TypeOrmModule.forRoot({
       type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: 'nam_do',
-      database: 'employees',
-      entities: [User, Role, Permission, RolePermission, Category, Flaggedrev, Page],
+      host: process.env.MYSQL_HOST,
+      port: process.env.MYSQL_POST ? parseInt(process.env.MYSQL_POST) : undefined,
+      username: process.env.MYSQL_USER,
+      password: process.env.MYSQL_ROOT_PASSWORD,
+      database: process.env.MYSQL_DB_NAME,
+      entities: [User],
       synchronize: false,
       cache: true,
-    }),
+      autoLoadEntities: true
+    },),
     UsersModule,
     AuthModule,
     ScheduleModule.forRoot(),
+    WinstonModule.forRoot({
+      format: winston.format.combine(
+        winston.format.timestamp({format:'HH:mm:ss DD-MM-YYYY'}),
+        winston.format.json(),
+      ),
+      transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({
+          dirname: path.join(__dirname, '../log/'), 
+          filename: 'log.log',
+          level: 'debug',
+        })
+      ],
+    }),
+    ThrottlerModule.forRoot({
+      ttl: process.env.THROTTLER_TTL ? parseInt(process.env.THROTTLER_TTL) : undefined,
+      limit: process.env.THROTTLER_LIMIT ? parseInt(process.env.THROTTLER_LIMIT) : undefined,
+    }),
     CacheModule.registerAsync({
       isGlobal: true,
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: async (config: ConfigService) => {
+      useFactory: async () => {
         const store = await redisStore({
           socket: {
-            host: redisOptions.host,
-            port: redisOptions.post,
+            host: process.env.REDIS_HOST,
+            port: process.env.REDIS_POST ? parseInt(process.env.REDIS_POST) : undefined,
           },
-          password: null,
-          ttl: 60
+          password: process.env.REDIS_PASSWORD,
+          ttl: process.env.REDIS_TTL ? parseInt(process.env.REDIS_TTL) : 0
         });
         return {
           store: store as unknown as CacheStore,
         };
       },
     }),
-    PagesModule,
-    CategoriesModule
   ],
   controllers: [AppController],
   providers: [
@@ -85,19 +91,34 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
       provide: APP_GUARD,
       useClass: AuthGuard
     },
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    },    
     TasksService,
     Helper,
+    {
+      provide: DataSource,
+      useFactory: async () => {
+        await AppDataSource.initialize();
+        return AppDataSource;
+    },
+  }
   ],
+  exports: [DataSource]
 })
 export class AppModule implements NestModule {
+  constructor(private dataSource: DataSource) {
+    // AppDataSource.initialize();
+  }
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(checkJwt)
       .exclude(
-      { path: 'api/auth/login', method: RequestMethod.POST },
-      { path: 'api/auth/register', method: RequestMethod.POST },
+        { path: 'api/auth/login', method: RequestMethod.POST },
+        { path: 'api/auth/register', method: RequestMethod.POST },
         //'auth/(.*)',
       )
-      .forRoutes(AuthController, UsersController, PagesController);
+      .forRoutes(AuthController, UsersController);
   }
 }

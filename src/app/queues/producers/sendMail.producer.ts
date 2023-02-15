@@ -10,7 +10,7 @@ export class QueueMailService {
   async sendMailTest(email:string, message : string) {
     await this.queue.add('sendMailTest',
     {
-      text: mainOptionsEmail(email, message)
+      content: mainOptionsEmail(email, message)
     }, 
     { 
       delay: 3000,

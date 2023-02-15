@@ -7,24 +7,17 @@ import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
 import * as jwt from 'jsonwebtoken';
 const bcrypt = require('bcrypt');
-import config from '../../../src/config/index.config';
-import { Role } from './entities/role.entity';
-import { AppDataSource } from 'typeOrm.config';
-import { RolePermission } from './entities/rolepermission.entity';
-import { DataSource } from 'typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly dataSource: DataSource,
+    @InjectRepository(User)
+    private readonly usersRepository: Repository<User>,
     private readonly usersService: UsersService,
-    @InjectRepository(Role)
-    private readonly rolesRepository: Repository<Role>,
-    @InjectRepository(RolePermission)
-    private readonly rolePermissionRepository: Repository<RolePermission>,
   ) {}
 
   async login(loginAuthDto: LoginAuthDto) {
+    // await this.usersRepository.softDelete(34);
     const checkEmptyUser = await this.usersService.findByEmail(
       loginAuthDto.email,
     );
@@ -36,22 +29,22 @@ export class AuthService {
       loginAuthDto.password,
       checkEmptyUser.password,
     );
+
     if (!checkPassword) {
       return { result: false, message: 'Password wrong!' };
     }
 
     const token = jwt.sign(
-      //Sing JWT, valid for 1 hour
       {
         id: checkEmptyUser.id,
         name: checkEmptyUser.name,
         email: checkEmptyUser.email,
       },
-      config.jwtSecret,
+      process.env.JWT_SECRET,
       { expiresIn: '1h' },
     );
 
-    const data: object = {
+    const data = {
       profile: checkEmptyUser,
       token: token,
     };
@@ -61,55 +54,5 @@ export class AuthService {
 
   register(registerAuthDto: RegisterAuthDto) {
     return `This action returns all auth`;
-  }
-
-  async listRoles(params: any) {
-    const limitRow = 5;
-    const offset: number = params.page ? (params.page - 1) * limitRow : 0;
-    const roles = await this.rolesRepository.findAndCount({
-      select: ['id', 'name'],
-      take: limitRow,
-      skip: offset,
-    });
-
-    const data = {
-      listRoles: roles,
-      currentPage: params.page ?? 1,
-    };
-
-    return { result: data, message: 'List roles!' };
-  }
-
-  async addRole(params: any) {
-    const queryRunner = this.dataSource.createQueryRunner();
-    try {
-      await queryRunner.connect();
-      await queryRunner.startTransaction();
-      const role = this.rolesRepository.create({
-        name: params.name,
-      });
-
-      await queryRunner.manager.save(role);
-
-      if (Object.keys(params.list_permissions).length) {
-        for (var index in Object.keys(params.list_permissions)) {
-          console.log(params.list_permissions[index]);
-          var rolepermissions: RolePermission = this.rolePermissionRepository.create({
-            roleId: role.id,
-            permissionId: params.list_permissions[index]
-          });
-
-          await queryRunner.manager.save(rolepermissions);
-        }
-      }
-
-      await queryRunner.commitTransaction();
-
-      return { result: true, message: 'Create success!' };
-    } catch (err) {
-      await queryRunner.rollbackTransaction();
-      console.log(err);
-      return { result: false, message: 'Create fail!' };
-    }
   }
 }
