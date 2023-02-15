@@ -97,15 +97,15 @@ import { AppDataSource } from 'typeOrm.config';
     },    
     TasksService,
     Helper,
-    {
-      provide: DataSource,
-      useFactory: async () => {
-        await AppDataSource.initialize();
-        return AppDataSource;
-    },
-  }
+    // {
+    //   provide: DataSource,
+    //   useFactory: async () => {
+    //     await AppDataSource.initialize();
+    //     return AppDataSource;
+    // },
+    // }
   ],
-  exports: [DataSource]
+  // exports: [DataSource]
 })
 export class AppModule implements NestModule {
   constructor(private dataSource: DataSource) {
