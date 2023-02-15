@@ -15,9 +15,9 @@ export class AuthController extends BaseController {
 
   @Post('login')
   async login(@Body() loginAuthDto: LoginAuthDto, @Res() res: Response) {
-    let login = await this.authService.login(loginAuthDto);
+    // let login = await this.authService.login(loginAuthDto);
 
-    return !login.result ? this.clientError(res, login.message) : this.withData(res, login.result);
+    return this.withData(res);
   }
 
   @Post('register')

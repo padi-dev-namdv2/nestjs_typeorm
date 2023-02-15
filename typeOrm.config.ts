@@ -26,5 +26,5 @@ const options: DataSourceOptions & SeederOptions = {
     seeds: [MainSeeder],
     factories: ['src/database/factory/**/*{.ts,.js}'],
 };
-
+console.log(options);
 export const AppDataSource = new DataSource(options)

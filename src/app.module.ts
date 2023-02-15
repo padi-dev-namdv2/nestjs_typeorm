@@ -20,6 +20,10 @@ import { redisStore } from 'cache-manager-redis-store';
 import { ConfigService } from '@nestjs/config';
 import { CacheStore } from '@nestjs/common';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler'
+import { WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
+const path = require("path");
+import { AppDataSource } from 'typeOrm.config';
 
 @Module({
   imports: [
@@ -38,10 +42,25 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler'
       entities: [User],
       synchronize: false,
       cache: true,
-    }),
+      autoLoadEntities: true
+    },),
     UsersModule,
     AuthModule,
     ScheduleModule.forRoot(),
+    WinstonModule.forRoot({
+      format: winston.format.combine(
+        winston.format.timestamp({format:'HH:mm:ss DD-MM-YYYY'}),
+        winston.format.json(),
+      ),
+      transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({
+          dirname: path.join(__dirname, '../log/'), 
+          filename: 'log.log',
+          level: 'debug',
+        })
+      ],
+    }),
     ThrottlerModule.forRoot({
       ttl: process.env.THROTTLER_TTL ? parseInt(process.env.THROTTLER_TTL) : undefined,
       limit: process.env.THROTTLER_LIMIT ? parseInt(process.env.THROTTLER_LIMIT) : undefined,
@@ -78,10 +97,20 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler'
     },    
     TasksService,
     Helper,
+    {
+      provide: DataSource,
+      useFactory: async () => {
+        await AppDataSource.initialize();
+        return AppDataSource;
+    },
+  }
   ],
+  exports: [DataSource]
 })
 export class AppModule implements NestModule {
-  constructor(private dataSource: DataSource) { }
+  constructor(private dataSource: DataSource) {
+    // AppDataSource.initialize();
+  }
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(checkJwt)
