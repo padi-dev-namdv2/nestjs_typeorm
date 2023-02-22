@@ -1,6 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, Unique, CreateDateColumn, UpdateDateColumn, OneToMany, ManyToMany, JoinTable} from "typeorm";
 import { Length, IsNotEmpty, MinLength, MaxLength, Validate } from "class-validator";
-import * as bcrypt from "bcryptjs";
 import { User } from "../../users/entities/user.entity";
 import { Permission } from "./permission.entity";
 
@@ -9,7 +8,7 @@ export class Role {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({ unique: true })
     @MinLength(4, {
         message: 'Name is too short',
     })

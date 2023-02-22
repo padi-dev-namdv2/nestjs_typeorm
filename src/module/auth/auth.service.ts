@@ -91,16 +91,13 @@ export class AuthService {
 
       await queryRunner.manager.save(role);
 
-      if (Object.keys(params.list_permissions).length) {
-        for (var index in Object.keys(params.list_permissions)) {
-          console.log(params.list_permissions[index]);
-          var rolepermissions: RolePermission = this.rolePermissionRepository.create({
-            roleId: role.id,
-            permissionId: params.list_permissions[index]
-          });
+      if (params.list_permissions.length) {
+        const rolePermissions = params.list_permissions.map(permissionId => ({
+          roleId: role.id,
+          permissionId
+        }));
 
-          await queryRunner.manager.save(rolepermissions);
-        }
+        await queryRunner.manager.getRepository(RolePermission).insert(rolePermissions);
       }
 
       await queryRunner.commitTransaction();
@@ -109,7 +106,7 @@ export class AuthService {
     } catch (err) {
       await queryRunner.rollbackTransaction();
       console.log(err);
-      return { result: false, message: 'Create fail!' };
+      return { result: false, message: err };
     }
   }
 }

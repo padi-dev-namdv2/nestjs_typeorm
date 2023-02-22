@@ -20,6 +20,7 @@ import { ExcelService } from 'src/app/excel/export/user.export';
 import { excelUploadOptions } from 'src/config/excel.config';
 import { ImportUser } from 'src/app/excel/import/user.import';
 import path, { join } from 'path';
+import { ParseIntPipe } from '@nestjs/common';
 
 @Controller('api/users')
 export class UsersController extends BaseController {
@@ -69,10 +70,10 @@ export class UsersController extends BaseController {
   }
 
   @Delete('delete/:id')
-  async remove(@Param('id') id: number, @Res() res: Response) {
+  async remove(@Param('id', ParseIntPipe) id: number, @Res() res: Response) {
     const deleteUser = await this.usersService.remove(id);
 
-    return deleteUser ? this.withData(res, '', 'Delete Success!') : this.notFound(res, 'Not Found!');
+    return deleteUser.result ? this.withData(res, '', 'Delete Success!') : this.notFound(res, 'Not Found!');
   }
 
   @Get('/send-mail-test')

@@ -9,7 +9,7 @@ const options: DataSourceOptions & SeederOptions = {
     port: 3306,
     username: "root",
     password: "",
-    database: "employees",
+    database: "ticket",
     synchronize: false,
     logging: false,
     entities: [

@@ -79,7 +79,7 @@ export class UsersService {
   async remove(id: number) {
     const deleteUser = await this.usersRepository.delete(id);
 
-    return deleteUser.affected;
+    return { result: deleteUser.affected, message: 'Delete success'} ;
   }
 
   async findByEmail(email: string) {
@@ -92,7 +92,7 @@ export class UsersService {
   }
 
   async getAllQueryBuilder(params: any) {
-    const limitRow = 3;
+    const limitRow = 5;
     const page = params.page ? (params.page - 1) * limitRow : 1;
     const testAVG = this.dataSource.getRepository(User)
       .createQueryBuilder("user")
@@ -104,12 +104,14 @@ export class UsersService {
     const listUser = await this.dataSource.getRepository(User)
       .createQueryBuilder("user")
       .leftJoinAndSelect("user.role", "role")
+      .leftJoinAndSelect("role.permissions", "permissions")
       .select(["user.id", "user.name", "user.email"])
       .addSelect(["role.id", "role.name"])
+      .addSelect(['permissions.id', 'permissions.name', 'permissions.path', 'permissions.method'])
       .where('role.id is NOT NULL')
       .andWhere(
         new Brackets((query) => {
-          query.where('role.name = :name1 OR role.name = :name2' , 
+          query.where('role.name = :name1 OR role.name = :name2', 
             { name1: 'Blogger', name2: 'CTV' }
           )
         })

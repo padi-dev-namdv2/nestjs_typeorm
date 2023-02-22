@@ -1,0 +1,73 @@
+version: "3.5"
+
+services:
+  admin:
+    image: phpmyadmin/phpmyadmin:latest
+    links:
+     - db:${MYSQL_HOST}
+    depends_on:
+     - db
+    ports:
+     - "8081:80"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      PMA_HOST: ${MYSQL_HOST}
+      PMA_PORT: ${MYSQL_PORT}
+      UPLOAD_LIMIT: 4000M
+
+  redis:
+    container_name: test-redis
+    image: redis
+    ports:
+      - "6379:6379"
+    restart: always
+
+  db:
+    build: ./database
+    image: mysql:5.7
+    container_name: ${MYSQL_HOST}
+    volumes:
+      - ./database/data:/var/lib/mysql
+    ports:
+      - "${MYSQL_PORT}:${MYSQL_PORT}"
+    environment:
+      MYSQL_TCP_PORT: ${MYSQL_PORT}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DB_NAME}
+
+  backend:
+    build:
+      context: ./
+      dockerfile: app.Dockerfile
+    image: node:18-alpine
+    working_dir: /app
+    restart: always
+    container_name: backend
+    links:
+      - db:${MYSQL_HOST}
+    depends_on:
+      - db
+    ports:
+      - "${PORT}:${PORT}"
+    volumes:
+      - ./:/app
+    expose:
+      - "${PORT}"
+    command: 'npm run start:dev'
+    env_file: .env
+
+  zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+    volumes:
+      - /data/zookeeper:/opt/zookeeper*
+  kafka:
+    image: wurstmeister/kafka
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: 127.0.0.1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    depends_on:
+      - zookeeper

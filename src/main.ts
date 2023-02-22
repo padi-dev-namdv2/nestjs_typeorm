@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 import { HttpExceptionFilter } from './app/exceptions/filter.exception';
 const express = require('express');
 import * as session from 'express-session';
-import { Transport } from '@nestjs/microservices';
+import { Transport, MicroserviceOptions } from '@nestjs/microservices';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

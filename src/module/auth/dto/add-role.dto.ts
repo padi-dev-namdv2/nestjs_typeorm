@@ -1,9 +1,14 @@
-import { IsEmail, IsNotEmpty, MaxLength, MinLength, IsString, IsArray, ValidateNested, ArrayMinSize } from 'class-validator';
+import { IsEmail, IsNotEmpty, MaxLength, MinLength, IsString, IsArray, ValidateNested, ArrayMinSize, Validate } from 'class-validator';
 import { Type } from 'class-transformer';
+import { Role } from '../entities/role.entity';
+import { IsUnique } from '@youba/nestjs-dbvalidator';
+
 export class AddRoleDto {
     @IsString()
     @MaxLength(255)
     @MinLength(6)
+    @Validate(IsUnique, 
+    [ { table: "roles", column: "name" }] )
     name: string;
 
     @IsArray()

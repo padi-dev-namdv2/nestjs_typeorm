@@ -35,6 +35,8 @@ import { Category } from './module/categories/entities/category.entity';
 import { Flaggedrev } from './module/categories/entities/flaggedrev.entity';
 import { redisOptions } from './config/redis.config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { BlogModule } from './module/blog/blog.module';
+import { DbValidatorsModule } from '@youba/nestjs-dbvalidator';
 
 @Module({
   imports: [
@@ -48,11 +50,19 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
       host: 'localhost',
       port: 3306,
       username: 'root',
-      password: 'nam_do',
+      password: '',
       database: 'employees',
       entities: [User, Role, Permission, RolePermission, Category, Flaggedrev, Page],
       synchronize: false,
       cache: true,
+    }),
+    DbValidatorsModule.register({
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      password: '',
+      database: 'employees',
     }),
     UsersModule,
     AuthModule,
@@ -76,7 +86,8 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
       },
     }),
     PagesModule,
-    CategoriesModule
+    CategoriesModule,
+    BlogModule
   ],
   controllers: [AppController],
   providers: [
