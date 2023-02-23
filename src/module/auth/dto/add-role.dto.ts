@@ -8,7 +8,7 @@ export class AddRoleDto {
     @MaxLength(255)
     @MinLength(6)
     @Validate(IsUnique, 
-    [ { table: "roles", column: "name" }] )
+    [ { table: Role, column: "name" }] )
     name: string;
 
     @IsArray()

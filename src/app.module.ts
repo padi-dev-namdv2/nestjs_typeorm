@@ -46,6 +46,7 @@ import { DbValidatorsModule } from '@youba/nestjs-dbvalidator';
     }),
     TypeOrmModule.forFeature([User, Role]),
     TypeOrmModule.forRoot({
+      name: 'default',
       type: 'mysql',
       host: 'localhost',
       port: 3306,
@@ -55,14 +56,6 @@ import { DbValidatorsModule } from '@youba/nestjs-dbvalidator';
       entities: [User, Role, Permission, RolePermission, Category, Flaggedrev, Page],
       synchronize: false,
       cache: true,
-    }),
-    DbValidatorsModule.register({
-      type: 'mysql',
-      host: 'localhost',
-      port: 3306,
-      username: 'root',
-      password: '',
-      database: 'employees',
     }),
     UsersModule,
     AuthModule,
@@ -101,6 +94,11 @@ import { DbValidatorsModule } from '@youba/nestjs-dbvalidator';
   ],
 })
 export class AppModule implements NestModule {
+  constructor(private dataSource: DataSource) {}
+
+    getDataSource() {
+       return this.dataSource;
+    }
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(checkJwt)

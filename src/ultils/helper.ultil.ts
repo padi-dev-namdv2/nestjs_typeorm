@@ -5,11 +5,11 @@ import { InjectRepository } from "@nestjs/typeorm";
 import jwt_decode from "jwt-decode";
 import { DataSource } from "typeorm";
 import * as Redis from 'redis';
+import { getRepository } from "typeorm";
 
 @Injectable()
 export class Helper {
     private redisClient: any;
-
     constructor(private readonly dataSource: DataSource,
     ) {
         this.redisClient = Redis.createClient();
@@ -48,4 +48,25 @@ export class Helper {
               });
         });
     }
+
+    static convertToArray(toConvert: any): Array<any> {
+      if (Array.isArray(toConvert)) return toConvert;
+
+      var array = toConvert.split(",");
+      return array;
+  }
+
+  /**
+   * deleteDuplicate is a function to delete duplicate values from an array
+   * @param array
+   */
+  static deleteDuplicate(array: Array<any>): Array<any> {
+      return array.filter((item, index) => array.indexOf(item) == index)
+  }
+
+  async checkUnique() {
+    const result = await this.dataSource.getRepository(User).find();
+    // console.log(result);
+    return result;
+  }
 }

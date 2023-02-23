@@ -81,6 +81,8 @@ export class AuthService {
   }
 
   async addRole(params: any) {
+    const result = await this.dataSource.getRepository(User).find();
+    console.log(result);
     const queryRunner = this.dataSource.createQueryRunner();
     try {
       await queryRunner.connect();

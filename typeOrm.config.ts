@@ -4,12 +4,13 @@ import { SeederOptions, SeederFactoryManager } from "typeorm-extension"
 import { MainSeeder } from "./src/database/seeder/main.seeder";
 
 const options: DataSourceOptions & SeederOptions = {
+    name: 'default',
     type: "mysql",
     host: "localhost",
     port: 3306,
     username: "root",
     password: "",
-    database: "ticket",
+    database: "employees",
     synchronize: false,
     logging: false,
     entities: [
