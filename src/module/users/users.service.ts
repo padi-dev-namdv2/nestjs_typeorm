@@ -26,6 +26,7 @@ export class UsersService {
   }
 
   async findAll(params: any) {
+    throw new HttpException('Lỗi test', HttpStatus.INTERNAL_SERVER_ERROR);
     const limitRow = 5;
     const offset = params.page ? (params.page - 1) * limitRow : 0;
     const listRole = await this.roleRepository.find({

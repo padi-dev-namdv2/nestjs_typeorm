@@ -1,5 +1,5 @@
 import * as express from 'express'
-import { CustomErrorHandler } from 'src/middleware/customErrorHandler.middleware';
+// import { CustomErrorHandler } from 'src/middleware/customErrorHandler.middleware';
 import { UseAfter, UseBefore } from 'routing-controllers';
 
 export abstract class BaseController {

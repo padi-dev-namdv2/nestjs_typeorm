@@ -33,7 +33,7 @@ const data = [
 ];
 
 export class ExcelService {
-    @UseFilters(HttpExceptionFilter)
+    // @UseFilters(HttpExceptionFilter)
     async userExport() {
         let rows: Array<any> = [];
 

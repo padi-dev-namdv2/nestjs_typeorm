@@ -14,7 +14,7 @@ import { Permission } from './module/auth/entities/permission.entity';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   await createConnection({
-    name: 'default',
+    // name: 'default',
     type: "mysql",
     host: "localhost",
     port: 3306,
@@ -25,12 +25,12 @@ async function bootstrap() {
     logging: false,
     entities: [
       Role, User, Permission
-  ],
+    ],
   });
-  app.useGlobalPipes(new ValidationPipe());
-  app.enableCors();
-  app.use(bodyParser.json());
-  app.use(bodyParser.urlencoded({ extended: false }));
+  // app.useGlobalPipes(new ValidationPipe());
+  // app.enableCors();
+  // app.use(bodyParser.json());
+  // app.use(bodyParser.urlencoded({ extended: false }));
   // app.useGlobalFilters(new HttpExceptionFilter());
   app.use(
     session({

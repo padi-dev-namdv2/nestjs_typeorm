@@ -6,8 +6,11 @@ import jwt_decode from "jwt-decode";
 import { DataSource } from "typeorm";
 import * as Redis from 'redis';
 import { getRepository } from "typeorm";
+import { Container, Service } from 'typedi';
+import 'reflect-metadata';
 
 @Injectable()
+@Service()
 export class Helper {
     private redisClient: any;
     constructor(private readonly dataSource: DataSource,

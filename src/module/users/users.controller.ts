@@ -38,15 +38,15 @@ export class UsersController extends BaseController {
   ]))
   create(@UploadedFiles() files: { avatar?: Express.Multer.File[], thumb?: Express.Multer.File }, @Body() createUserDto: CreateUserDto) {
     console.log(files.thumb[0].path);
-    // throw new HttpException('File is not allowed!', HttpStatus.INTERNAL_SERVER_ERROR);
+    throw new HttpException('File is not allowed!', HttpStatus.INTERNAL_SERVER_ERROR);
     return this.usersService.create(createUserDto);
   }
 
   @Get('/list')
   async findAll(@Res() res: Response, @Req() req: any) {
     const listUser = await this.usersService.findAll(req.query);
-
-    return this.withData(res, listUser.result);
+    // throw new HttpException('File is not allowed!', HttpStatus.INTERNAL_SERVER_ERROR);
+    // return this.withData(res, listUser.result);
   }
 
   @Get('/use-query-builder')

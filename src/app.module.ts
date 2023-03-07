@@ -1,4 +1,10 @@
-import { Module, NestModule, MiddlewareConsumer, RequestMethod, CacheModuleOptions } from '@nestjs/common';
+import {
+  Module,
+  NestModule,
+  MiddlewareConsumer,
+  RequestMethod,
+  CacheModuleOptions,
+} from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -37,14 +43,23 @@ import { redisOptions } from './config/redis.config';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { BlogModule } from './module/blog/blog.module';
 import { DbValidatorsModule } from '@youba/nestjs-dbvalidator';
+import { Unique } from './decorator/unique.decarotor';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ".env"
+      envFilePath: '.env',
     }),
-    TypeOrmModule.forFeature([User, Role]),
+    TypeOrmModule.forFeature([
+      User,
+      Role,
+      Permission,
+      RolePermission,
+      Category,
+      Flaggedrev,
+      Page,
+    ]),
     TypeOrmModule.forRoot({
       name: 'default',
       type: 'mysql',
@@ -53,7 +68,15 @@ import { DbValidatorsModule } from '@youba/nestjs-dbvalidator';
       username: 'root',
       password: '',
       database: 'employees',
-      entities: [User, Role, Permission, RolePermission, Category, Flaggedrev, Page],
+      entities: [
+        User,
+        Role,
+        Permission,
+        RolePermission,
+        Category,
+        Flaggedrev,
+        Page,
+      ],
       synchronize: false,
       cache: true,
     }),
@@ -71,7 +94,7 @@ import { DbValidatorsModule } from '@youba/nestjs-dbvalidator';
             port: redisOptions.post,
           },
           password: null,
-          ttl: 60
+          ttl: 60,
         });
         return {
           store: store as unknown as CacheStore,
@@ -80,33 +103,38 @@ import { DbValidatorsModule } from '@youba/nestjs-dbvalidator';
     }),
     PagesModule,
     CategoriesModule,
-    BlogModule
+    BlogModule,
   ],
   controllers: [AppController],
   providers: [
     AppService,
-    {
-      provide: APP_GUARD,
-      useClass: AuthGuard
-    },
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: AuthGuard,
+    // },
     TasksService,
     Helper,
+    Unique
   ],
+  exports: [
+    Unique
+  ]
 })
 export class AppModule implements NestModule {
   constructor(private dataSource: DataSource) {}
 
-    getDataSource() {
-       return this.dataSource;
-    }
+  getDataSource() {
+    return this.dataSource;
+  }
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(checkJwt)
-      .exclude(
-      { path: 'api/auth/login', method: RequestMethod.POST },
-      { path: 'api/auth/register', method: RequestMethod.POST },
-        //'auth/(.*)',
-      )
-      .forRoutes(AuthController, UsersController, PagesController);
+    // consumer
+    //   .apply(checkJwt)
+    //   .exclude(
+    //     { path: 'api/auth/login', method: RequestMethod.POST },
+    //     { path: 'api/auth/register', method: RequestMethod.POST },
+    //     { path: 'api/users/list', method: RequestMethod.GET },
+    //     //'auth/(.*)',
+    //   )
+    //   .forRoutes(AuthController, UsersController, PagesController);
   }
 }
